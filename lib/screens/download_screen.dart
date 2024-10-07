@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+class DownloadScreen extends StatelessWidget {
+  const DownloadScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Settings"),
+        title: const Text("Download Page"),
       ),
       body: Center(
         child: ElevatedButton(
