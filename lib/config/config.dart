@@ -13,8 +13,8 @@ class Config {
 
   factory Config.fromJson(Map<String, dynamic> json) {
     return Config(
-      app: json['app'].fromJson(),
-      dlc: json['dlc'].fromJson(),
+      app: Source.fromJson(json['app']),
+      dlc: Source.fromJson(json['dlc']),
     );
   }
 }

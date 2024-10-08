@@ -1,4 +1,4 @@
-# vita_dl
+# VitaDL
 
 A PSVita application downloader
 

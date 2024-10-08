@@ -12,9 +12,15 @@ class ConfigProvider with ChangeNotifier {
 
   Config get config => _config;
 
+  Future<String> getConfigPath() async {
+    final directory = Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
+    return '${directory?.path}/VitaDL/config/config.json';
+  }
+
   Future<void> loadConfig() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/config/config.json');
+    final file = File(await getConfigPath());
 
     if (await file.exists()) {
       String contents = await file.readAsString();
@@ -24,8 +30,7 @@ class ConfigProvider with ChangeNotifier {
   }
 
   Future<void> saveConfig() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/VitaDL/config/config.json');
+    final file = File(await getConfigPath());
     await file.writeAsString(json.encode(_config.toJson()));
   }
 
