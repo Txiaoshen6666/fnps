@@ -1,19 +1,21 @@
 class Content {
+  final int? id;
   final String type; // app | dlc | theme
   final String titleID;
   final String region;
   final String name;
-  final String? pkgDirectLink;
-  final String? zRIF;
+  final String pkgDirectLink;
+  final String zRIF;
   final String contentID;
-  final DateTime? lastModificationDate;
-  final String? originalName;
-  final String? fileSize;
-  final String? sha256;
-  final String? requiredFW;
-  final String? appVersion;
+  final String lastModificationDate;
+  final String originalName;
+  final String fileSize;
+  final String sha256;
+  final String requiredFW;
+  final String appVersion;
 
   Content({
+    this.id,
     required this.type,
     required this.titleID,
     required this.region,
@@ -31,57 +33,61 @@ class Content {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'type': type,
-      'titleId': titleID,
+      'titleID': titleID,
       'region': region,
       'name': name,
       'pkgDirectLink': pkgDirectLink,
       'zRIF': zRIF,
-      'contentId': contentID,
-      'lastModificationDate': lastModificationDate?.toIso8601String(),
+      'contentID': contentID,
+      'lastModificationDate': lastModificationDate,
       'originalName': originalName,
       'fileSize': fileSize,
       'sha256': sha256,
-      'requiredFw': requiredFW,
+      'requiredFW': requiredFW,
       'appVersion': appVersion,
     };
   }
 
   factory Content.fromMap(Map<String, dynamic> map) {
     return Content(
+      id: map['id'],
       type: map['type'],
-      titleID: map['titleId'],
+      titleID: map['titleID'],
       region: map['region'],
       name: map['name'],
       pkgDirectLink: map['pkgDirectLink'],
       zRIF: map['zRIF'],
-      contentID: map['contentId'],
-      lastModificationDate: map['lastModificationDate'] == null
-          ? null
-          : DateTime.tryParse(map['lastModificationDate']),
+      contentID: map['contentID'],
+      lastModificationDate: map['lastModificationDate'],
       originalName: map['originalName'],
       fileSize: map['fileSize'].toString(),
       sha256: map['sha256'],
-      requiredFW: map['requiredFw'],
+      requiredFW: map['requiredFW'],
       appVersion: map['appVersion'],
     );
   }
 
+  static checkNull(String? text) =>
+      (text == null || text == 'MISSING' || text.isEmpty) ? '' : text;
+
   factory Content.convert(Map<String, dynamic> map) {
     return Content(
+      id: map['ID'],
       type: map['Type'],
       titleID: map['Title ID'],
       region: map['Region'],
       name: map['Name'],
-      pkgDirectLink: map['PKG direct link'],
-      zRIF: map['zRIF'],
-      contentID: map['Content ID'],
-      lastModificationDate: DateTime.tryParse(map['Last Modification Date']),
-      originalName: map['Original Name'],
-      fileSize: map['File Size'].toString(),
-      sha256: map['SHA256'],
-      requiredFW: map['Required FW'],
-      appVersion: map['App Version'],
+      pkgDirectLink: checkNull(map['PKG direct link']),
+      zRIF: checkNull(map['zRIF']),
+      contentID: checkNull(map['Content ID']),
+      lastModificationDate: checkNull(map['Last Modification Date']),
+      originalName: checkNull(map['Original Name']),
+      fileSize: checkNull(map['File Size']),
+      sha256: checkNull(map['SHA256']),
+      requiredFW: checkNull(map['Required FW']),
+      appVersion: checkNull(map['App Version']),
     );
   }
 }

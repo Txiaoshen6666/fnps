@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:vita_dl/config/config_provider.dart';
 import 'package:vita_dl/model/content_model.dart';
 import 'package:vita_dl/screens/content_screen.dart';
 import 'package:vita_dl/screens/download_screen.dart';
@@ -11,7 +13,12 @@ void main() {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
-  runApp(const VitaDL());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ConfigProvider()..loadConfig(),
+      child: const VitaDL(),
+    ),
+  );
 }
 
 class VitaDL extends StatelessWidget {

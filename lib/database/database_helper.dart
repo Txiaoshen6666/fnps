@@ -32,20 +32,20 @@ class DatabaseHelper {
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE contents(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         type TEXT, -- app | dlc | theme
-        titleId TEXT,
+        titleID TEXT,
         region TEXT,
         name TEXT,
         pkgDirectLink TEXT,
         zRIF TEXT,
-        contentId TEXT,
+        contentID TEXT,
         lastModificationDate TEXT,
         originalName TEXT,
         fileSize INTEGER,
         sha256 TEXT,
-        requiredFw TEXT,
-        appVersion TEXT,
-        PRIMARY KEY (type, titleId)
+        requiredFW TEXT,
+        appVersion TEXT
       )
     ''');
   }
@@ -73,11 +73,45 @@ class DatabaseHelper {
     await batch.commit(noResult: true);
   }
 
-  Future<List<Content>> getContents() async {
+  Future<List<Content>> getContents(String? type, String? titleId) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('contents');
+    String whereClause = '';
+    List<dynamic> whereArgs = [];
+
+    if (type != null) {
+      whereClause += 'type = ?';
+      whereArgs.add(type);
+    }
+
+    if (titleId != null) {
+      if (whereClause.isNotEmpty) {
+        whereClause += ' AND ';
+      }
+      whereClause += 'titleId = ?';
+      whereArgs.add(titleId);
+    }
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'contents',
+      where: whereClause.isNotEmpty ? whereClause : null,
+      whereArgs: whereArgs.isNotEmpty ? whereArgs : null,
+    );
     return List.generate(maps.length, (i) {
       return Content.fromMap(maps[i]);
     });
+  }
+
+  Future<void> deleteContentsByType(String type) async {
+    final db = await database;
+    await db.delete(
+      'contents',
+      where: 'type = ?',
+      whereArgs: [type],
+    );
+  }
+
+  Future<void> deleteContents() async {
+    final db = await database;
+    await db.delete('contents');
   }
 }

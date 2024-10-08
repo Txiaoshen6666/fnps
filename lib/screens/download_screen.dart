@@ -7,11 +7,11 @@ class DownloadScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Download Page"),
+        title: const Text('Download Page'),
       ),
       body: Center(
         child: ElevatedButton(
-          child: const Text("Back to Home"),
+          child: const Text('Back to Home'),
           onPressed: () {
             Navigator.pop(context);
           },
