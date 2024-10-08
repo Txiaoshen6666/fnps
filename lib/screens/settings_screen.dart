@@ -1,13 +1,14 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:vita_dl/config/config.dart';
-import 'package:vita_dl/config/config_provider.dart';
+import 'package:vita_dl/model/config_model.dart';
+import 'package:vita_dl/provider/config_provider.dart';
 import 'package:vita_dl/model/content_model.dart';
+import 'package:vita_dl/utils/uri.dart';
 
 import '../database/database_helper.dart';
 
@@ -26,12 +27,6 @@ class _SettingsScreen extends State<SettingsScreen> {
   void initState() {
     super.initState();
     configProvider = Provider.of<ConfigProvider>(context, listen: false);
-  }
-
-  Future<void> _launchURL(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
-      throw Exception('Could not launch $url');
-    }
   }
 
   Future<void> _updateConfig(
@@ -89,7 +84,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       await dbHelper.insertContents(contents);
       await _updateConfig(type, 'local', '', DateTime.now().toIso8601String());
     } else {
-      print('File does not exist.');
+      log('File does not exist.');
     }
   }
 
@@ -130,7 +125,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             ListTile(
               title: const Text('VitaDL'),
               subtitle: const Text('A PSVita application downloader'),
-              onTap: () => _launchURL('https://github.com/nini22P/VitaDL'),
+              onTap: () => launchURL('https://github.com/nini22P/VitaDL'),
             ),
           ],
         ));

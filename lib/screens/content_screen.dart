@@ -1,11 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 import 'package:vita_dl/database/database_helper.dart';
 import 'package:vita_dl/model/content_model.dart';
 import 'package:vita_dl/utils/content_info.dart';
 import 'package:vita_dl/utils/file_size_convert.dart';
+import 'package:vita_dl/utils/uri.dart';
 
 class ContentScreen extends StatefulWidget {
   const ContentScreen({super.key, required this.content});
@@ -32,15 +34,7 @@ class _ContentScreenState extends State<ContentScreen> {
     }
     List<Content> fetchedDLCs =
         await dbHelper.getContents('dlc', widget.content.titleID);
-    setState(() {
-      dlcs = fetchedDLCs;
-    });
-  }
-
-  Future<void> _launchURL(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
-      throw Exception('Could not launch $url');
-    }
+    setState(() => dlcs = fetchedDLCs);
   }
 
   Future<void> _copyToClipboard(String text, String label) async {
@@ -92,7 +86,7 @@ class _ContentScreenState extends State<ContentScreen> {
                             },
                             errorBuilder: (BuildContext context, Object error,
                                 StackTrace? stackTrace) {
-                              print('Error loading image: $error');
+                              log('Error loading image: $error');
                               return const SizedBox();
                             },
                           )),
@@ -165,7 +159,7 @@ class _ContentScreenState extends State<ContentScreen> {
                         ElevatedButton(
                           onPressed: widget.content.pkgDirectLink.isEmpty
                               ? null
-                              : () => _launchURL(widget.content.pkgDirectLink),
+                              : () => launchURL(widget.content.pkgDirectLink),
                           child: Text(widget.content.pkgDirectLink.isEmpty
                               ? 'Dowload link not available'
                               : 'Download'),
@@ -214,7 +208,7 @@ class _ContentScreenState extends State<ContentScreen> {
                                   ? const SizedBox()
                                   : IconButton(
                                       onPressed: () =>
-                                          _launchURL(dlc.pkgDirectLink),
+                                          launchURL(dlc.pkgDirectLink),
                                       icon: const Icon(Icons.download)),
                               dlc.pkgDirectLink.isEmpty
                                   ? const SizedBox()

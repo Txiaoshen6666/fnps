@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:vita_dl/utils/storage.dart';
@@ -113,5 +111,12 @@ class DatabaseHelper {
   Future<void> deleteContents() async {
     final db = await database;
     await db.delete('contents');
+  }
+
+  Future<List<String>> getRegions() async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+        'SELECT DISTINCT region FROM contents WHERE region IS NOT NULL');
+    return result.map((e) => e['region'] as String).toList();
   }
 }

@@ -1,9 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vita_dl/config/config_provider.dart';
-import 'package:vita_dl/utils/content_info.dart';
+import 'package:vita_dl/model/config_model.dart';
+import 'package:vita_dl/provider/config_provider.dart';
 
 import '../database/database_helper.dart';
 import '../model/content_model.dart';
@@ -19,12 +17,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomePageState extends State<HomeScreen> {
   final DatabaseHelper dbHelper = DatabaseHelper();
+
   List<Content> contents = [];
+
+  String searchText = '';
+
+  List<String> regions = [];
+
+  Map<String, bool> selectedRegions = {};
+
+  final TextEditingController _controller = TextEditingController();
+
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _fetchContents();
+    _fetchRegions();
   }
 
   Future<void> _fetchContents() async {
@@ -35,11 +45,51 @@ class _HomePageState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _fetchRegions() async {
+    List<String> fetchedRegion = await dbHelper.getRegions();
+    setState(() {
+      regions = fetchedRegion;
+      for (var region in regions) {
+        selectedRegions[region] = true;
+      }
+    });
+  }
+
+  void _setSearchText(String text) {
+    setState(() {
+      searchText = text;
+    });
+  }
+
+  void _clearSearchText() {
+    _controller.clear();
+    _setSearchText('');
+    _focusNode.unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
 
-    bool isNotInitialized = configProvider.config.app.updateTime.isEmpty;
+    Config config = configProvider.config;
+
+    bool isNotInitialized = config.app.updateTime.isEmpty;
+
+    List<Content> filteredContents = contents.where((content) {
+      Set<String> selectedRegionKeys = selectedRegions.entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .toSet();
+
+      return (content.name.toLowerCase().contains(searchText.toLowerCase()) ||
+              content.contentID
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase()) ||
+              content.originalName
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase())) &&
+          selectedRegionKeys.contains(content.region);
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -55,11 +105,32 @@ class _HomePageState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
+              _focusNode.unfocus();
               Navigator.pushNamed(context, '/settings').then((_) {
                 _fetchContents();
+                _fetchRegions();
               });
             },
           ),
+          PopupMenuButton<String>(
+              icon: const Icon(Icons.filter_list),
+              onSelected: (value) {
+                setState(() {
+                  selectedRegions[value] = !selectedRegions[value]!;
+                });
+              },
+              itemBuilder: (BuildContext context) => regions
+                  .map(
+                    (String region) => CheckedPopupMenuItem<String>(
+                      value: region,
+                      checked: selectedRegions[region] ?? false,
+                      child: Text(region),
+                    ),
+                  )
+                  .toList()),
+          const SizedBox(
+            width: 16,
+          )
         ],
       ),
       body: isNotInitialized
@@ -76,56 +147,81 @@ class _HomePageState extends State<HomeScreen> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/settings').then((_) {
                         _fetchContents();
+                        _fetchRegions();
                       });
                     },
                     child: const Text('Settings')),
               ],
             ))
-          : contents.isEmpty
-              ? null
-              : ListView.builder(
-                  itemCount: contents.length,
-                  itemBuilder: (context, index) {
-                    final content = contents[index];
-                    return ListTile(
-                      title: Text(content.name),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(99),
-                            ),
-                            child: Text(
-                              content.region,
-                              style: const TextStyle(color: Colors.white),
-                            ),
+          : Column(children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  onChanged: (value) => _setSearchText(value),
+                  decoration: InputDecoration(
+                    labelText: 'Search',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: searchText.isEmpty
+                        ? null
+                        : IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: _clearSearchText,
                           ),
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.blueGrey,
-                              borderRadius: BorderRadius.circular(99),
-                            ),
-                            child: Text(
-                              content.titleID,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/content',
-                            arguments: content);
-                      },
-                    );
-                  },
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                  ),
                 ),
+              ),
+              Expanded(
+                  child: ListView.builder(
+                itemCount: filteredContents.length,
+                itemBuilder: (context, index) {
+                  final content = filteredContents[index];
+                  return ListTile(
+                    title: Text(content.name),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: Text(
+                            content.region,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: Text(
+                            content.titleID,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      _focusNode.unfocus();
+                      Navigator.pushNamed(context, '/content',
+                          arguments: content);
+                    },
+                  );
+                },
+              ))
+            ]),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: _fetchContents,
       //   tooltip: 'Refresh',
