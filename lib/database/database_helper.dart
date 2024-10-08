@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:vita_dl/utils/storage.dart';
 
 import '../model/content_model.dart';
 
@@ -21,13 +21,8 @@ class DatabaseHelper {
     return _database!;
   }
 
-  Future<String> getDatabasePath() async {
-    print(await getExternalStorageDirectory());
-    final directory = Platform.isAndroid
-        ? await getExternalStorageDirectory()
-        : await getApplicationDocumentsDirectory();
-    return join(directory!.path, 'VitaDL', 'config', 'contents.db');
-  }
+  Future<String> getDatabasePath() async =>
+      join(await getDataPath(), 'config', 'contents.db');
 
   Future<Database> _initDB(String fileName) async {
     String path = await getDatabasePath();

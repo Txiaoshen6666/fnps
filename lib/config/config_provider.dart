@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:vita_dl/utils/storage.dart';
 import 'config.dart';
 
 class ConfigProvider with ChangeNotifier {
@@ -12,12 +14,8 @@ class ConfigProvider with ChangeNotifier {
 
   Config get config => _config;
 
-  Future<String> getConfigPath() async {
-    final directory = Platform.isAndroid
-        ? await getExternalStorageDirectory()
-        : await getApplicationDocumentsDirectory();
-    return '${directory?.path}/VitaDL/config/config.json';
-  }
+  Future<String> getConfigPath() async =>
+      join(await getDataPath(), 'config', 'config.json');
 
   Future<void> loadConfig() async {
     final file = File(await getConfigPath());

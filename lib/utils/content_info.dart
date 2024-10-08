@@ -1,4 +1,4 @@
-const String baseUrl =
+const String baseApiUrl =
     "https://store.playstation.com/store/api/chihiro/00_09_000/container";
 
 Map<String, String> regionMap = {
@@ -10,4 +10,4 @@ Map<String, String> regionMap = {
 };
 
 String getContentIcon(String contentID) =>
-    "$baseUrl/${regionMap[contentID.substring(0, 2)]}/999/$contentID/image";
+    "$baseApiUrl/${regionMap[contentID.substring(0, 2)]}/999/$contentID/image";
