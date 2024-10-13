@@ -2,9 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import 'package:vita_dl/database/database_helper.dart';
+import 'package:vita_dl/model/config_model.dart';
 import 'package:vita_dl/model/content_model.dart';
+import 'package:vita_dl/provider/config_provider.dart';
 import 'package:vita_dl/utils/content_info.dart';
 import 'package:vita_dl/utils/file_size_convert.dart';
 import 'package:vita_dl/utils/uri.dart';
@@ -21,11 +24,23 @@ class ContentScreen extends StatefulWidget {
 class _ContentScreenState extends State<ContentScreen> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   List<Content> dlcs = [];
+  PackageInfo? updateInfo;
 
   @override
   void initState() {
     super.initState();
     _fetchDLCs();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final configProvider = Provider.of<ConfigProvider>(context);
+    Config config = configProvider.config;
+    String hmacKey = config.hmacKey;
+    if (hmacKey.isNotEmpty) {
+      _fetchUpdateInfo(hmacKey);
+    }
   }
 
   Future<void> _fetchDLCs() async {
@@ -35,6 +50,14 @@ class _ContentScreenState extends State<ContentScreen> {
     List<Content> fetchedDLCs =
         await dbHelper.getContents('dlc', widget.content.titleID);
     setState(() => dlcs = fetchedDLCs);
+  }
+
+  Future<void> _fetchUpdateInfo(String hmacKey) async {
+    if (widget.content.type != 'app') {
+      return;
+    }
+    PackageInfo? info = await getUpdateLink(widget.content.titleID, hmacKey);
+    setState(() => updateInfo = info);
   }
 
   Future<void> _copyToClipboard(String text, String label) async {
@@ -48,7 +71,6 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var fileSize = fileSizeConvert(widget.content.fileSize);
     return Scaffold(
         appBar: AppBar(
             // title: Text(widget.content.name),
@@ -144,13 +166,19 @@ class _ContentScreenState extends State<ContentScreen> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    fileSize == null
-                        ? const SizedBox()
-                        : Text('Size: $fileSize MB'),
-                    widget.content.appVersion.isEmpty
+                    widget.content.appVersion.isEmpty &&
+                            updateInfo?.version == null
                         ? const SizedBox()
                         : Text(
-                            'App version: ${widget.content.appVersion.toString()}'),
+                            'Version: ${updateInfo?.version ?? widget.content.appVersion.toString()}'),
+                    widget.content.fileSize.isEmpty
+                        ? const SizedBox()
+                        : Text(
+                            'App size: ${fileSizeConvert(widget.content.fileSize)} MB'),
+                    updateInfo?.size == null
+                        ? const SizedBox()
+                        : Text(
+                            'Update size: ${fileSizeConvert(updateInfo!.size)} MB'),
                     const SizedBox(height: 16),
                     Wrap(
                       spacing: 8,
@@ -162,17 +190,30 @@ class _ContentScreenState extends State<ContentScreen> {
                               : () => launchURL(widget.content.pkgDirectLink),
                           child: Text(widget.content.pkgDirectLink.isEmpty
                               ? 'Dowload link not available'
-                              : 'Download'),
+                              : 'Download App'),
                         ),
-                        ElevatedButton(
-                          onPressed: widget.content.pkgDirectLink.isEmpty
-                              ? null
-                              : () => _copyToClipboard(
-                                  widget.content.pkgDirectLink, 'Link'),
-                          child: Text(widget.content.pkgDirectLink.isEmpty
-                              ? 'Dowload link not available'
-                              : 'Copy Link'),
-                        ),
+                        widget.content.pkgDirectLink.isEmpty
+                            ? const SizedBox()
+                            : ElevatedButton(
+                                onPressed: () => _copyToClipboard(
+                                    widget.content.pkgDirectLink, 'Link'),
+                                child: Text(widget.content.pkgDirectLink.isEmpty
+                                    ? 'Dowload link not available'
+                                    : 'Copy App Link'),
+                              ),
+                        updateInfo?.url == null
+                            ? const SizedBox()
+                            : ElevatedButton(
+                                onPressed: () => launchURL(updateInfo!.url),
+                                child: const Text('Download Update'),
+                              ),
+                        updateInfo?.url == null
+                            ? const SizedBox()
+                            : ElevatedButton(
+                                onPressed: () => _copyToClipboard(
+                                    updateInfo!.url, 'Update Link'),
+                                child: const Text('Copy Update Link'),
+                              ),
                         ElevatedButton(
                           onPressed: widget.content.zRIF.isEmpty
                               ? null

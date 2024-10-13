@@ -9,6 +9,7 @@ class ConfigProvider with ChangeNotifier {
   Config _config = Config(
     app: Source(type: 'local', updateTime: '', url: ''),
     dlc: Source(type: 'local', updateTime: '', url: ''),
+    hmacKey: '',
   );
 
   Config get config => _config;

@@ -1,13 +1,15 @@
 class Config {
   Source app;
   Source dlc;
+  String hmacKey;
 
-  Config({required this.app, required this.dlc});
+  Config({required this.app, required this.dlc, required this.hmacKey});
 
   Map<String, dynamic> toJson() {
     return {
       'app': app.toJson(),
       'dlc': dlc.toJson(),
+      'hmacKey': hmacKey,
     };
   }
 
@@ -15,6 +17,7 @@ class Config {
     return Config(
       app: Source.fromJson(json['app']),
       dlc: Source.fromJson(json['dlc']),
+      hmacKey: json['hmacKey'],
     );
   }
 }
