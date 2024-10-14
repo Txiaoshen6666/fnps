@@ -25,12 +25,7 @@ class PackageInfo {
 String getContentIcon(String contentID) =>
     "$baseApiUrl/${regionMap[contentID.substring(0, 2)]}/999/$contentID/image";
 
-
 String getUpdateXmlLink(String titleID, String hmacKey) {
-
-  const String url =
-      "http://gs-sec.ww.np.dl.playstation.net/pl/np/{0}/{1}/{0}-ver.xml";
-
   List<int> binary = [];
   String key = "0x$hmacKey";
 
@@ -47,7 +42,7 @@ String getUpdateXmlLink(String titleID, String hmacKey) {
       .join()
       .toLowerCase();
 
-  return url.replaceAll("{0}", titleID).replaceAll("{1}", hash);
+  return "http://gs-sec.ww.np.dl.playstation.net/pl/np/$titleID/$hash/$titleID-ver.xml";
 }
 
 Future<PackageInfo?> getUpdateLink(String titleID, String hmacKey) async {

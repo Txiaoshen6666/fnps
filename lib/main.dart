@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:vita_dl/provider/config_provider.dart';
 import 'package:vita_dl/model/content_model.dart';
@@ -9,9 +9,10 @@ import 'package:vita_dl/screens/download_screen.dart';
 import 'package:vita_dl/screens/home_screen.dart';
 import 'package:vita_dl/screens/settings_screen.dart';
 
-void main() {
+Future<void> main() async {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
+  await dotenv.load(fileName: '.env');
 
   runApp(
     ChangeNotifierProvider(

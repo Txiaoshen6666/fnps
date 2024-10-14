@@ -29,14 +29,14 @@ class _SettingsScreen extends State<SettingsScreen> {
     configProvider = Provider.of<ConfigProvider>(context, listen: false);
   }
 
-  Future<void> _updateConfig(
+  Future<void> _updateSource(
       String source, String type, String url, String updateTime) async {
     if (source == 'app') {
       Source app = configProvider.config.app;
       app.type = type;
       app.url = url;
       app.updateTime = updateTime;
-      configProvider.updateConfig(app, null);
+      configProvider.updateConfig({'app': app});
     }
 
     if (source == 'dlc') {
@@ -44,8 +44,12 @@ class _SettingsScreen extends State<SettingsScreen> {
       dlc.type = type;
       dlc.url = url;
       dlc.updateTime = updateTime;
-      configProvider.updateConfig(null, dlc);
+      configProvider.updateConfig({'dlc': dlc});
     }
+  }
+
+  Future<void> _updateHmacKey(String hmacKey) async {
+    configProvider.updateConfig({'hmacKey': hmacKey});
   }
 
   Future<void> _pickTsvFile(String type) async {
@@ -82,7 +86,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       }
       await dbHelper.deleteContentsByType(type);
       await dbHelper.insertContents(contents);
-      await _updateConfig(type, 'local', '', DateTime.now().toIso8601String());
+      await _updateSource(type, 'local', '', DateTime.now().toIso8601String());
     } else {
       log('File does not exist.');
     }
@@ -94,10 +98,12 @@ class _SettingsScreen extends State<SettingsScreen> {
 
     Config config = configProvider.config;
 
-    Future<void> clearListData() async {
+    final TextEditingController hmacKeyController =
+        TextEditingController(text: config.hmacKey);
+
+    Future<void> resetConfig() async {
       await dbHelper.deleteContents();
-      await _updateConfig('app', '', '', '');
-      await _updateConfig('dlc', '', '', '');
+      await configProvider.resetConfig();
     }
 
     return Scaffold(
@@ -108,20 +114,49 @@ class _SettingsScreen extends State<SettingsScreen> {
           children: [
             ListTile(
               title: const Text('Update game list'),
-              subtitle: Text(config.app.updateTime.replaceAll('T', ' ')),
+              subtitle: Text(
+                  config.app.updateTime.replaceAll('T', ' ').split('.').first),
               onTap: () => _pickTsvFile('app'),
             ),
             ListTile(
               title: const Text('Update dlc list'),
-              subtitle: Text(config.dlc.updateTime.replaceAll('T', ' ')),
+              subtitle: Text(
+                  config.dlc.updateTime.replaceAll('T', ' ').split('.').first),
               onTap: () => _pickTsvFile('dlc'),
             ),
             ListTile(
-              title: const Text('Clear list data'),
-              subtitle: const Text('All list data will be cleared'),
-              onTap: clearListData,
+              title: const Text('HMAC Key'),
+              subtitle: Text(config.hmacKey),
+              onTap: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('HMAC Key'),
+                  content: TextField(
+                    controller: hmacKeyController,
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancal'),
+                      child: const Text('Cancal'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _updateHmacKey(hmacKeyController.text);
+                        Navigator.pop(context, 'OK');
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const Divider(color: Colors.grey, thickness: 1),
+            const Divider(),
+            ListTile(
+              title: const Text('Reset config'),
+              subtitle: const Text('All config will be reset'),
+              onTap: resetConfig,
+            ),
+            const Divider(),
             ListTile(
               title: const Text('VitaDL'),
               subtitle: const Text('A PSVita application downloader'),

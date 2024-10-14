@@ -20,6 +20,18 @@ class Config {
       hmacKey: json['hmacKey'],
     );
   }
+
+  void updateFromJson(Map<String, dynamic> updates) {
+    if (updates.containsKey('app')) {
+      app = updates['app'];
+    }
+    if (updates.containsKey('dlc')) {
+      dlc = updates['dlc'];
+    }
+    if (updates.containsKey('hmacKey')) {
+      hmacKey = updates['hmacKey'];
+    }
+  }
 }
 
 class Source {

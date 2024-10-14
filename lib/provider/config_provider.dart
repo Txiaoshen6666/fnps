@@ -1,16 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart';
 import 'package:vita_dl/utils/storage.dart';
 import '../model/config_model.dart';
 
 class ConfigProvider with ChangeNotifier {
-  Config _config = Config(
-    app: Source(type: 'local', updateTime: '', url: ''),
-    dlc: Source(type: 'local', updateTime: '', url: ''),
-    hmacKey: '',
-  );
+  static final String hmacKey = dotenv.env['HMAC_KEY'] ?? '';
+
+  static final initConfig = {
+    'app': {'type': 'local', 'updateTime': '', 'url': ''},
+    'dlc': {'type': 'local', 'updateTime': '', 'url': ''},
+    'hmacKey': hmacKey,
+  };
+
+  Config _config = Config.fromJson(initConfig);
 
   Config get config => _config;
 
@@ -32,13 +37,15 @@ class ConfigProvider with ChangeNotifier {
     await file.writeAsString(json.encode(_config.toJson()));
   }
 
-  void updateConfig(Source? app, Source? dlc) {
-    if (app != null) {
-      _config.app = app;
-    }
-    if (dlc != null) {
-      _config.dlc = dlc;
-    }
+  void updateConfig(Map<String, dynamic> updates) {
+    _config.updateFromJson(updates);
+    saveConfig();
+    notifyListeners();
+  }
+
+  Future<void> resetConfig() async {
+    print(initConfig['hmacKey']);
+    _config = Config.fromJson(initConfig);
     saveConfig();
     notifyListeners();
   }
