@@ -1,16 +1,15 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:vita_dl/database/database_helper.dart';
 import 'package:vita_dl/model/config_model.dart';
 import 'package:vita_dl/provider/config_provider.dart';
 import 'package:vita_dl/model/content_model.dart';
 import 'package:vita_dl/utils/uri.dart';
-
-import '../database/database_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -108,43 +107,43 @@ class _SettingsScreen extends State<SettingsScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Settings'),
+          title: Text(AppLocalizations.of(context)!.settings),
         ),
         body: Column(
           children: [
             ListTile(
-              title: const Text('Update game list'),
+              title: Text(AppLocalizations.of(context)!.updateAppList),
               subtitle: Text(
                   config.app.updateTime.replaceAll('T', ' ').split('.').first),
               onTap: () => _pickTsvFile('app'),
             ),
             ListTile(
-              title: const Text('Update dlc list'),
+              title: Text(AppLocalizations.of(context)!.updateDLCList),
               subtitle: Text(
                   config.dlc.updateTime.replaceAll('T', ' ').split('.').first),
               onTap: () => _pickTsvFile('dlc'),
             ),
             ListTile(
-              title: const Text('HMAC Key'),
+              title: Text(AppLocalizations.of(context)!.hmacKey),
               subtitle: Text(config.hmacKey),
               onTap: () => showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                  title: const Text('HMAC Key'),
+                  title: Text(AppLocalizations.of(context)!.hmacKey),
                   content: TextField(
                     controller: hmacKeyController,
                   ),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context, 'Cancal'),
-                      child: const Text('Cancal'),
+                      child: Text(AppLocalizations.of(context)!.cancel),
                     ),
                     TextButton(
                       onPressed: () {
                         _updateHmacKey(hmacKeyController.text);
                         Navigator.pop(context, 'OK');
                       },
-                      child: const Text('OK'),
+                      child: Text(AppLocalizations.of(context)!.ok),
                     ),
                   ],
                 ),
@@ -152,8 +151,8 @@ class _SettingsScreen extends State<SettingsScreen> {
             ),
             const Divider(),
             ListTile(
-              title: const Text('Reset config'),
-              subtitle: const Text('All config will be reset'),
+              title: Text(AppLocalizations.of(context)!.resetConfig),
+              subtitle: Text(AppLocalizations.of(context)!.resetConfigSub),
               onTap: resetConfig,
             ),
             const Divider(),

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:vita_dl/database/database_helper.dart';
 import 'package:vita_dl/model/config_model.dart';
 import 'package:vita_dl/model/content_model.dart';
@@ -60,11 +60,11 @@ class _ContentScreenState extends State<ContentScreen> {
     setState(() => updateInfo = info);
   }
 
-  Future<void> _copyToClipboard(String text, String label) async {
+  Future<void> _copyToClipboard(String text, String description) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$label copied')),
+        SnackBar(content: Text(description)),
       );
     }
   }
@@ -165,20 +165,20 @@ class _ContentScreenState extends State<ContentScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     widget.content.appVersion.isEmpty &&
                             updateInfo?.version == null
                         ? const SizedBox()
                         : Text(
-                            'Version: ${updateInfo?.version ?? widget.content.appVersion.toString()}'),
+                            '${AppLocalizations.of(context)!.version}: ${updateInfo?.version ?? widget.content.appVersion.toString()}'),
                     widget.content.fileSize.isEmpty
                         ? const SizedBox()
                         : Text(
-                            'App size: ${fileSizeConvert(widget.content.fileSize)} MB'),
+                            '${AppLocalizations.of(context)!.size}: ${fileSizeConvert(widget.content.fileSize)} MB'),
                     updateInfo?.size == null
                         ? const SizedBox()
                         : Text(
-                            'Update size: ${fileSizeConvert(updateInfo!.size)} MB'),
+                            '${AppLocalizations.of(context)!.updateSize}: ${fileSizeConvert(updateInfo!.size)} MB'),
                     const SizedBox(height: 16),
                     Wrap(
                       spacing: 8,
@@ -189,40 +189,48 @@ class _ContentScreenState extends State<ContentScreen> {
                               ? null
                               : () => launchURL(widget.content.pkgDirectLink),
                           child: Text(widget.content.pkgDirectLink.isEmpty
-                              ? 'Dowload link not available'
-                              : 'Download App'),
+                              ? AppLocalizations.of(context)!
+                                  .dowloadLinkNotAvailable
+                              : AppLocalizations.of(context)!.download),
                         ),
                         widget.content.pkgDirectLink.isEmpty
                             ? const SizedBox()
                             : ElevatedButton(
                                 onPressed: () => _copyToClipboard(
-                                    widget.content.pkgDirectLink, 'Link'),
+                                    widget.content.pkgDirectLink,
+                                    AppLocalizations.of(context)!
+                                        .downloadLinkCopied),
                                 child: Text(widget.content.pkgDirectLink.isEmpty
-                                    ? 'Dowload link not available'
-                                    : 'Copy App Link'),
+                                    ? AppLocalizations.of(context)!
+                                        .dowloadLinkNotAvailable
+                                    : AppLocalizations.of(context)!.copyLink),
                               ),
+                        ElevatedButton(
+                          onPressed: widget.content.zRIF.isEmpty
+                              ? null
+                              : () => _copyToClipboard(widget.content.zRIF,
+                                  AppLocalizations.of(context)!.zRIFCopied),
+                          child: Text(widget.content.zRIF.isEmpty
+                              ? AppLocalizations.of(context)!.zRIFNotAvailable
+                              : '${AppLocalizations.of(context)!.copy} zRIF'),
+                        ),
                         updateInfo?.url == null
                             ? const SizedBox()
                             : ElevatedButton(
                                 onPressed: () => launchURL(updateInfo!.url),
-                                child: const Text('Download Update'),
+                                child: Text(AppLocalizations.of(context)!
+                                    .downloadUpdate),
                               ),
                         updateInfo?.url == null
                             ? const SizedBox()
                             : ElevatedButton(
                                 onPressed: () => _copyToClipboard(
-                                    updateInfo!.url, 'Update Link'),
-                                child: const Text('Copy Update Link'),
+                                    updateInfo!.url,
+                                    AppLocalizations.of(context)!
+                                        .updateLinkCopied),
+                                child: Text(AppLocalizations.of(context)!
+                                    .copyUpdateLink),
                               ),
-                        ElevatedButton(
-                          onPressed: widget.content.zRIF.isEmpty
-                              ? null
-                              : () =>
-                                  _copyToClipboard(widget.content.zRIF, 'zRIF'),
-                          child: Text(widget.content.zRIF.isEmpty
-                              ? 'zRIF not available'
-                              : 'Copy zRIF'),
-                        ),
                       ],
                     ),
                   ],

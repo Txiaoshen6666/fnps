@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:vita_dl/provider/config_provider.dart';
 import 'package:vita_dl/model/content_model.dart';
 import 'package:vita_dl/screens/content_screen.dart';
@@ -33,6 +34,8 @@ class VitaDL extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const HomeScreen(title: 'VitaDL'),
       routes: {
         '/settings': (context) => const SettingsScreen(),

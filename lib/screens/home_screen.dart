@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:vita_dl/database/database_helper.dart';
 import 'package:vita_dl/model/config_model.dart';
+import 'package:vita_dl/model/content_model.dart';
 import 'package:vita_dl/provider/config_provider.dart';
-
-import '../database/database_helper.dart';
-import '../model/content_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -138,8 +138,8 @@ class _HomePageState extends State<HomeScreen> {
               child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Please add contents in settings.',
+                Text(
+                  AppLocalizations.of(context)!.addContentsNotice,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
@@ -150,7 +150,7 @@ class _HomePageState extends State<HomeScreen> {
                         _fetchRegions();
                       });
                     },
-                    child: const Text('Settings')),
+                    child: Text(AppLocalizations.of(context)!.settings)),
               ],
             ))
           : Column(children: [
