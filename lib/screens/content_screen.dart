@@ -263,13 +263,17 @@ class _ContentScreenState extends State<ContentScreen> {
                                   ? const SizedBox()
                                   : IconButton(
                                       onPressed: () => _copyToClipboard(
-                                          dlc.pkgDirectLink, 'DLC link'),
+                                          dlc.pkgDirectLink,
+                                          AppLocalizations.of(context)!
+                                              .dlcLinkCopied),
                                       icon: const Icon(Icons.copy)),
                               dlc.zRIF.isEmpty
                                   ? const SizedBox()
                                   : IconButton(
-                                      onPressed: () =>
-                                          _copyToClipboard(dlc.zRIF, 'zRIF'),
+                                      onPressed: () => _copyToClipboard(
+                                          dlc.zRIF,
+                                          AppLocalizations.of(context)!
+                                              .zRIFCopied),
                                       icon: const Icon(Icons.key)),
                             ],
                           ));
