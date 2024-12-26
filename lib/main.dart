@@ -5,10 +5,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:vita_dl/provider/config_provider.dart';
 import 'package:vita_dl/model/content_model.dart';
-import 'package:vita_dl/screens/content_screen.dart';
-import 'package:vita_dl/screens/download_screen.dart';
-import 'package:vita_dl/screens/home_screen.dart';
-import 'package:vita_dl/screens/settings_screen.dart';
+import 'package:vita_dl/pages/content_page.dart';
+import 'package:vita_dl/pages/home_page.dart';
 
 Future<void> main() async {
   sqfliteFfiInit();
@@ -36,17 +34,13 @@ class VitaDL extends StatelessWidget {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const HomeScreen(title: 'VitaDL'),
-      routes: {
-        '/settings': (context) => const SettingsScreen(),
-        '/download': (context) => const DownloadScreen(),
-      },
+      home: const HomePage(title: 'VitaDL'),
       onGenerateRoute: (settings) {
         if (settings.name == '/content') {
-          final args = settings.arguments as Content;
+          final content = settings.arguments as Content;
           return MaterialPageRoute(
             builder: (context) {
-              return ContentScreen(content: args);
+              return ContentPage(content: content);
             },
           );
         }

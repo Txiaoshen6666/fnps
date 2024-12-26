@@ -1,21 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart';
 import 'package:vita_dl/utils/storage.dart';
 import '../model/config_model.dart';
 
 class ConfigProvider with ChangeNotifier {
-  static final String hmacKey = dotenv.env['HMAC_KEY'] ?? '';
-
-  static final initConfig = {
-    'app': {'type': 'local', 'updateTime': '', 'url': ''},
-    'dlc': {'type': 'local', 'updateTime': '', 'url': ''},
-    'hmacKey': hmacKey,
-  };
-
-  Config _config = Config.fromJson(initConfig);
+  Config _config = Config.fromJson(Config.initConfig);
 
   Config get config => _config;
 
@@ -44,8 +35,7 @@ class ConfigProvider with ChangeNotifier {
   }
 
   Future<void> resetConfig() async {
-    print(initConfig['hmacKey']);
-    _config = Config.fromJson(initConfig);
+    _config = Config.fromJson(Config.initConfig);
     saveConfig();
     notifyListeners();
   }

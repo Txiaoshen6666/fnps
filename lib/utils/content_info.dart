@@ -14,12 +14,12 @@ Map<String, String> regionMap = {
   "HP": "hk/zh",
 };
 
-class PackageInfo {
+class Package {
   final String version;
   final String size;
   final String url;
 
-  PackageInfo({required this.version, required this.size, required this.url});
+  Package({required this.version, required this.size, required this.url});
 }
 
 String getContentIcon(String contentID) =>
@@ -45,7 +45,7 @@ String getUpdateXmlLink(String titleID, String hmacKey) {
   return "http://gs-sec.ww.np.dl.playstation.net/pl/np/$titleID/$hash/$titleID-ver.xml";
 }
 
-Future<PackageInfo?> getUpdateLink(String titleID, String hmacKey) async {
+Future<Package?> getUpdateLink(String titleID, String hmacKey) async {
   var xmlLink = getUpdateXmlLink(titleID, hmacKey);
 
   var response = await HttpClient().getUrl(Uri.parse(xmlLink));
@@ -68,7 +68,7 @@ Future<PackageInfo?> getUpdateLink(String titleID, String hmacKey) async {
     final size = package.getAttribute('size') ?? '';
     final url = package.getAttribute('url') ?? '';
 
-    return PackageInfo(version: version, size: size, url: url);
+    return Package(version: version, size: size, url: url);
   }
   return null;
 }

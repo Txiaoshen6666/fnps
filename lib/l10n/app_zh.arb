@@ -24,8 +24,10 @@
   "settings": "设置",
   "updateAppList": "更新应用列表",
   "updateDLCList": "更新 DLC 列表",
+  "updateThemeList": "更新主题列表",
   "hmacKey": "HMAC 密钥",
   "resetConfig": "重置配置",
   "resetConfigSub": "所有配置将被重置",
-  "addContentsNotice": "请先前往设置添加内容"
+  "addContentsNotice": "请先前往设置添加内容",
+  "serach": "搜索"
 }

@@ -71,14 +71,15 @@ class DatabaseHelper {
     await batch.commit(noResult: true);
   }
 
-  Future<List<Content>> getContents(String? type, String? titleId) async {
+  Future<List<Content>> getContents(
+      List<String>? types, String? titleId) async {
     final db = await database;
     String whereClause = '';
     List<dynamic> whereArgs = [];
 
-    if (type != null) {
-      whereClause += 'type = ?';
-      whereArgs.add(type);
+    if (types != null && types.isNotEmpty) {
+      whereClause += 'type IN (${List.filled(types.length, '?').join(',')})';
+      whereArgs.addAll(types);
     }
 
     if (titleId != null) {
@@ -94,18 +95,24 @@ class DatabaseHelper {
       where: whereClause.isNotEmpty ? whereClause : null,
       whereArgs: whereArgs.isNotEmpty ? whereArgs : null,
     );
+
     return List.generate(maps.length, (i) {
       return Content.fromMap(maps[i]);
     });
   }
 
-  Future<void> deleteContentsByType(String type) async {
+  Future<void> deleteContentsByTypes(List<String> types) async {
     final db = await database;
-    await db.delete(
-      'contents',
-      where: 'type = ?',
-      whereArgs: [type],
-    );
+
+    if (types.isNotEmpty) {
+      String whereClause =
+          'type IN (${List.filled(types.length, '?').join(',')})';
+      await db.delete(
+        'contents',
+        where: whereClause,
+        whereArgs: types,
+      );
+    }
   }
 
   Future<void> deleteContents() async {

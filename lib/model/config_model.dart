@@ -1,14 +1,30 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class Config {
   Source app;
   Source dlc;
+  Source theme;
   String hmacKey;
 
-  Config({required this.app, required this.dlc, required this.hmacKey});
+  Config({
+    required this.app,
+    required this.dlc,
+    required this.theme,
+    required this.hmacKey,
+  });
+
+  static final initConfig = {
+    'app': {'type': 'local', 'updateTime': '', 'url': ''},
+    'dlc': {'type': 'local', 'updateTime': '', 'url': ''},
+    'theme': {'type': 'local', 'updateTime': '', 'url': ''},
+    'hmacKey': dotenv.env['HMAC_KEY'] ?? '',
+  };
 
   Map<String, dynamic> toJson() {
     return {
       'app': app.toJson(),
       'dlc': dlc.toJson(),
+      'theme': theme.toJson(),
       'hmacKey': hmacKey,
     };
   }
@@ -17,6 +33,7 @@ class Config {
     return Config(
       app: Source.fromJson(json['app']),
       dlc: Source.fromJson(json['dlc']),
+      theme: Source.fromJson(json['theme']),
       hmacKey: json['hmacKey'],
     );
   }
@@ -27,6 +44,9 @@ class Config {
     }
     if (updates.containsKey('dlc')) {
       dlc = updates['dlc'];
+    }
+    if (updates.containsKey('theme')) {
+      theme = updates['theme'];
     }
     if (updates.containsKey('hmacKey')) {
       hmacKey = updates['hmacKey'];
@@ -55,9 +75,9 @@ class Source {
 
   factory Source.fromJson(Map<String, dynamic> json) {
     return Source(
-      type: json['type'],
-      updateTime: json['updateTime'],
-      url: json['url'],
+      type: json['type'] ?? 'local',
+      updateTime: json['updateTime'] ?? '',
+      url: json['url'] ?? '',
     );
   }
 }

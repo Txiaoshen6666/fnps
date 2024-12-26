@@ -24,8 +24,10 @@
   "settings": "Settings",
   "updateAppList": "Update App List",
   "updateDLCList": "Update DLC List",
+  "updateThemeList": "Update Theme List",
   "hmacKey": "HMAC Key",
   "resetConfig": "Reset Config",
   "resetConfigSub": "All config will be reset",
-  "addContentsNotice": "Please add contents in settings first"
+  "addContentsNotice": "Please add contents in settings first",
+  "serach": "Search"
 }
