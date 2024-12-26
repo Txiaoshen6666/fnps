@@ -28,8 +28,8 @@ class ConfigProvider with ChangeNotifier {
     await file.writeAsString(json.encode(_config.toJson()));
   }
 
-  void updateConfig(Map<String, dynamic> updates) {
-    _config.updateFromJson(updates);
+  void updateConfig(Config config) {
+    _config = config;
     saveConfig();
     notifyListeners();
   }

@@ -19,7 +19,6 @@ class Settings extends HookWidget {
   Widget build(BuildContext context) {
     final t = getLocalizations(context);
     final configProvider = Provider.of<ConfigProvider>(context);
-
     Config config = configProvider.config;
 
     final TextEditingController hmacKeyController =
@@ -30,32 +29,24 @@ class Settings extends HookWidget {
     Future<void> updateSource(
         String source, String type, String url, String updateTime) async {
       if (source == 'app') {
-        Source app = configProvider.config.app;
-        app.type = type;
-        app.url = url;
-        app.updateTime = updateTime;
-        configProvider.updateConfig({'app': app});
+        configProvider.updateConfig(configProvider.config.copyWith(
+            app: Source(type: type, updateTime: updateTime, url: url)));
       }
 
       if (source == 'dlc') {
-        Source dlc = configProvider.config.dlc;
-        dlc.type = type;
-        dlc.url = url;
-        dlc.updateTime = updateTime;
-        configProvider.updateConfig({'dlc': dlc});
+        configProvider.updateConfig(configProvider.config.copyWith(
+            dlc: Source(type: type, updateTime: updateTime, url: url)));
       }
 
       if (source == 'theme') {
-        Source theme = configProvider.config.theme;
-        theme.type = type;
-        theme.url = url;
-        theme.updateTime = updateTime;
-        configProvider.updateConfig({'theme': theme});
+        configProvider.updateConfig(configProvider.config.copyWith(
+            theme: Source(type: type, updateTime: updateTime, url: url)));
       }
     }
 
     Future<void> updateHmacKey(String hmacKey) async {
-      configProvider.updateConfig({'hmacKey': hmacKey});
+      configProvider
+          .updateConfig(configProvider.config.copyWith(hmacKey: hmacKey));
     }
 
     Future<void> readFile(String filePath, String type) async {

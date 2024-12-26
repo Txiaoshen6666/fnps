@@ -31,6 +31,40 @@ class Content {
     required this.appVersion,
   });
 
+  Content copyWith({
+    int? id,
+    String? type,
+    String? titleID,
+    String? region,
+    String? name,
+    String? pkgDirectLink,
+    String? zRIF,
+    String? contentID,
+    String? lastModificationDate,
+    String? originalName,
+    String? fileSize,
+    String? sha256,
+    String? requiredFW,
+    String? appVersion,
+  }) {
+    return Content(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      titleID: titleID ?? this.titleID,
+      region: region ?? this.region,
+      name: name ?? this.name,
+      pkgDirectLink: pkgDirectLink ?? this.pkgDirectLink,
+      zRIF: zRIF ?? this.zRIF,
+      contentID: contentID ?? this.contentID,
+      lastModificationDate: lastModificationDate ?? this.lastModificationDate,
+      originalName: originalName ?? this.originalName,
+      fileSize: fileSize ?? this.fileSize,
+      sha256: sha256 ?? this.sha256,
+      requiredFW: requiredFW ?? this.requiredFW,
+      appVersion: appVersion ?? this.appVersion,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

@@ -5,12 +5,14 @@ class Config {
   Source dlc;
   Source theme;
   String hmacKey;
+  List<String> regions;
 
   Config({
     required this.app,
     required this.dlc,
     required this.theme,
     required this.hmacKey,
+    required this.regions,
   });
 
   static final initConfig = {
@@ -18,7 +20,24 @@ class Config {
     'dlc': {'type': 'local', 'updateTime': '', 'url': ''},
     'theme': {'type': 'local', 'updateTime': '', 'url': ''},
     'hmacKey': dotenv.env['HMAC_KEY'] ?? '',
+    'regions': ['JP', 'US', 'INT', 'EU', 'ASIA', 'UNKNOWN'],
   };
+
+  Config copyWith({
+    Source? app,
+    Source? dlc,
+    Source? theme,
+    String? hmacKey,
+    List<String>? regions,
+  }) {
+    return Config(
+      app: app ?? this.app,
+      dlc: dlc ?? this.dlc,
+      theme: theme ?? this.theme,
+      hmacKey: hmacKey ?? this.hmacKey,
+      regions: regions ?? this.regions,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -26,6 +45,7 @@ class Config {
       'dlc': dlc.toJson(),
       'theme': theme.toJson(),
       'hmacKey': hmacKey,
+      'regions': regions,
     };
   }
 
@@ -35,22 +55,8 @@ class Config {
       dlc: Source.fromJson(json['dlc']),
       theme: Source.fromJson(json['theme']),
       hmacKey: json['hmacKey'],
+      regions: List<String>.from(json['regions']),
     );
-  }
-
-  void updateFromJson(Map<String, dynamic> updates) {
-    if (updates.containsKey('app')) {
-      app = updates['app'];
-    }
-    if (updates.containsKey('dlc')) {
-      dlc = updates['dlc'];
-    }
-    if (updates.containsKey('theme')) {
-      theme = updates['theme'];
-    }
-    if (updates.containsKey('hmacKey')) {
-      hmacKey = updates['hmacKey'];
-    }
   }
 }
 
@@ -64,6 +70,18 @@ class Source {
     required this.updateTime,
     required this.url,
   });
+
+  Source copyWith({
+    String? type,
+    String? updateTime,
+    String? url,
+  }) {
+    return Source(
+      type: type ?? this.type,
+      updateTime: updateTime ?? this.updateTime,
+      url: url ?? this.url,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {

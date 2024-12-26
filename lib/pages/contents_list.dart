@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
 import 'package:vita_dl/database/database_helper.dart';
+import 'package:vita_dl/model/config_model.dart';
 import 'package:vita_dl/model/content_model.dart';
+import 'package:vita_dl/provider/config_provider.dart';
 import 'package:vita_dl/utils/get_localizations.dart';
 
 class ContentsList extends HookWidget {
@@ -16,15 +19,17 @@ class ContentsList extends HookWidget {
   Widget build(BuildContext context) {
     final t = getLocalizations(context);
 
+    final configProvider = Provider.of<ConfigProvider>(context);
+    Config config = configProvider.config;
+    final selectedRegions = config.regions;
+
     final contents = useState(<Content>[]);
     final filteredContents = useState(<Content>[]);
     final searchText = useState('');
-    final regions = useState(<String>[]);
-    final selectedRegions = useState(<String>[]);
+    final regions = ['JP', 'US', 'INT', 'EU', 'ASIA', 'UNKNOWN'];
 
     final focusNode = useFocusNode();
     final searchTextController = useTextEditingController();
-
     Future<void> fetchContents() async {
       final DatabaseHelper dbHelper = DatabaseHelper();
       List<Content> fetchedContents = await dbHelper.getContents(types, null);
@@ -32,16 +37,8 @@ class ContentsList extends HookWidget {
       contents.value = [...fetchedContents];
     }
 
-    Future<void> fetchRegions() async {
-      final DatabaseHelper dbHelper = DatabaseHelper();
-      List<String> fetchedRegion = await dbHelper.getRegions();
-      regions.value = [...fetchedRegion];
-      selectedRegions.value = [...fetchedRegion];
-    }
-
     useEffect(() {
       fetchContents();
-      fetchRegions();
       return;
     }, []);
 
@@ -57,10 +54,10 @@ class ContentsList extends HookWidget {
                   content.originalName
                       .toLowerCase()
                       .contains(searchText.value.toLowerCase())) &&
-              selectedRegions.value.contains(content.region))
+              selectedRegions.contains(content.region))
           .toList();
       return;
-    }, [searchText.value, selectedRegions.value, contents.value]);
+    }, [searchText.value, selectedRegions, contents.value]);
 
     void clearSearchText() {
       searchTextController.clear();
@@ -93,23 +90,22 @@ class ContentsList extends HookWidget {
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.filter_list),
                     onOpened: () => focusNode.unfocus(),
-                    itemBuilder: (BuildContext context) => regions.value
+                    itemBuilder: (BuildContext context) => regions
                         .map(
                           (String region) => CheckedPopupMenuItem<String>(
                             value: region,
-                            checked: selectedRegions.value.contains(region),
+                            checked: selectedRegions.contains(region),
                             child: Text(region),
                             onTap: () {
                               focusNode.unfocus();
-                              if (selectedRegions.value.contains(region)) {
-                                selectedRegions.value = selectedRegions.value
-                                    .where((element) => element != region)
-                                    .toList();
+                              if (selectedRegions.contains(region)) {
+                                configProvider.updateConfig(config.copyWith(
+                                    regions: selectedRegions
+                                        .where((element) => element != region)
+                                        .toList()));
                               } else {
-                                selectedRegions.value = [
-                                  ...selectedRegions.value,
-                                  region
-                                ];
+                                configProvider.updateConfig(config.copyWith(
+                                    regions: [...selectedRegions, region]));
                               }
                             },
                           ),
