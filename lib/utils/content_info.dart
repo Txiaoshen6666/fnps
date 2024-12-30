@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:xml/xml.dart';
 import 'package:crypto/crypto.dart';
 
@@ -44,9 +45,8 @@ Future<ContentInfo> getContentInfo(String contentID) async {
       "$baseApiUrl/${regionMap[contentID.substring(0, 2)]}/999/$contentID";
 
   try {
-    final response = await HttpClient().getUrl(Uri.parse(infoUrl));
-    final data = await response.close();
-    final jsonString = await data.transform(utf8.decoder).join();
+    final data = await DefaultCacheManager().getSingleFile(infoUrl);
+    final jsonString = await data.readAsString();
     final json = jsonDecode(jsonString);
 
     List<String> images = [];
@@ -91,10 +91,8 @@ Future<Update?> getUpdateLink(String titleID, String hmacKey) async {
   var xmlLink = getUpdateXmlLink(titleID, hmacKey);
 
   try {
-    var response = await HttpClient().getUrl(Uri.parse(xmlLink));
-    var data = await response.close();
-
-    var contents = await data.transform(utf8.decoder).join();
+    final data = await DefaultCacheManager().getSingleFile(xmlLink);
+    final contents = await data.readAsString();
     final document = XmlDocument.parse(contents);
 
     if (document.findElements('Error').isNotEmpty) {

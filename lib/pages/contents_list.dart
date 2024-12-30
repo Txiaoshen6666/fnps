@@ -123,6 +123,7 @@ class ContentsList extends HookWidget {
         ),
         Expanded(
           child: ListView.builder(
+            key: PageStorageKey(searchText.value),
             itemCount: filteredContents.value.length,
             itemBuilder: (context, index) {
               final content = filteredContents.value[index];

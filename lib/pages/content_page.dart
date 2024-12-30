@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -76,8 +75,8 @@ class ContentPage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-          // title: Text(content.name),
-          ),
+        title: Text(content.name),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -91,28 +90,16 @@ class ContentPage extends HookWidget {
                     height: 128,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
+                      child: CachedNetworkImage(
+                        imageUrl: getContentIcon(content.contentID),
                         fit: BoxFit.contain,
-                        getContentIcon(content.contentID),
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          } else {
-                            return Center(
-                                child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      (loadingProgress.expectedTotalBytes ?? 1)
-                                  : null,
-                            ));
-                          }
-                        },
-                        errorBuilder: (BuildContext context, Object error,
-                            StackTrace? stackTrace) {
-                          log('Error loading image: $error');
-                          return const SizedBox();
-                        },
+                        placeholder: (context, url) => const SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -182,6 +169,7 @@ class ContentPage extends HookWidget {
                       : Text(
                           '${t.updateSize}: ${fileSizeConvert(update!.size)} MB'),
                   const SizedBox(height: 16),
+                  // 各种按钮
                   Wrap(
                     spacing: 8,
                     runSpacing: 4,
@@ -226,6 +214,7 @@ class ContentPage extends HookWidget {
                             ),
                     ],
                   ),
+                  const SizedBox(height: 16),
                   contentInfo == null || contentInfo.images.isEmpty
                       ? const SizedBox()
                       : SingleChildScrollView(
@@ -234,16 +223,22 @@ class ContentPage extends HookWidget {
                             children: contentInfo.images
                                 .map(
                                   (image) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                      vertical: 16,
-                                    ),
-                                    height: 200,
+                                    padding: const EdgeInsets.all(4),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        image,
+                                      child: CachedNetworkImage(
+                                        imageUrl: image,
                                         fit: BoxFit.contain,
+                                        width: 480 / 3 * 2,
+                                        height: 272 / 3 * 2,
+                                        placeholder: (context, url) =>
+                                            const SizedBox(
+                                          width: 100,
+                                          height: 100,
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -251,6 +246,7 @@ class ContentPage extends HookWidget {
                                 .toList(),
                           ),
                         ),
+                  // 描述
                   contentInfo == null || contentInfo.desc.isEmpty
                       ? const SizedBox()
                       : html.Html(
@@ -259,6 +255,7 @@ class ContentPage extends HookWidget {
                 ],
               ),
             ),
+            // 主题
             themes.isEmpty
                 ? const SizedBox()
                 : Container(
@@ -308,6 +305,8 @@ class ContentPage extends HookWidget {
                       );
                     },
                   ),
+
+            // DLC
             dlcs.isEmpty
                 ? const SizedBox()
                 : Container(
