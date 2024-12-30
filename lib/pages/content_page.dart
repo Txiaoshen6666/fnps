@@ -79,95 +79,114 @@ class ContentPage extends HookWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 128,
-                    height: 128,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: CachedNetworkImage(
-                        imageUrl: getContentIcon(content.contentID),
-                        fit: BoxFit.contain,
-                        placeholder: (context, url) => const SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: Center(
-                            child: CircularProgressIndicator(),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      // 图标
+                      SizedBox(
+                        width: 128,
+                        height: 128,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: CachedNetworkImage(
+                            imageUrl: getContentIcon(content.contentID),
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => const SizedBox(
+                              width: 100,
+                              height: 100,
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.gamepad),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    content.name,
-                    style: const TextStyle(fontSize: 24.0),
-                  ),
-                  content.originalName.isEmpty
-                      ? const SizedBox()
-                      : Text(content.originalName),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: Text(
-                          content.region,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: Text(
-                          content.titleID,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: Text(
-                          content.type,
-                          style: const TextStyle(color: Colors.white),
-                        ),
+                      // 信息
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            content.name,
+                            style: const TextStyle(
+                              fontSize: 24.0,
+                            ),
+                          ),
+                          content.originalName.isEmpty
+                              ? const SizedBox()
+                              : Text(content.originalName),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: Text(
+                                  content.region,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueGrey,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: Text(
+                                  content.titleID,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueGrey,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: Text(
+                                  content.type,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          content.appVersion.isEmpty && update?.version == null
+                              ? const SizedBox()
+                              : Text(
+                                  '${t.version}: ${update?.version ?? content.appVersion.toString()}'),
+                          content.fileSize.isEmpty
+                              ? const SizedBox()
+                              : Text(
+                                  '${t.size}: ${fileSizeConvert(content.fileSize)} MB'),
+                          update?.size == null
+                              ? const SizedBox()
+                              : Text(
+                                  '${t.updateSize}: ${fileSizeConvert(update!.size)} MB'),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  content.appVersion.isEmpty && update?.version == null
-                      ? const SizedBox()
-                      : Text(
-                          '${t.version}: ${update?.version ?? content.appVersion.toString()}'),
-                  content.fileSize.isEmpty
-                      ? const SizedBox()
-                      : Text(
-                          '${t.size}: ${fileSizeConvert(content.fileSize)} MB'),
-                  update?.size == null
-                      ? const SizedBox()
-                      : Text(
-                          '${t.updateSize}: ${fileSizeConvert(update!.size)} MB'),
                   const SizedBox(height: 16),
                   // 各种按钮
                   Wrap(
@@ -214,7 +233,10 @@ class ContentPage extends HookWidget {
                             ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  // 截图
+                  contentInfo == null || contentInfo.images.isEmpty
+                      ? const SizedBox()
+                      : const SizedBox(height: 16),
                   contentInfo == null || contentInfo.images.isEmpty
                       ? const SizedBox()
                       : SingleChildScrollView(
@@ -239,6 +261,8 @@ class ContentPage extends HookWidget {
                                             child: CircularProgressIndicator(),
                                           ),
                                         ),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
                                       ),
                                     ),
                                   ),
@@ -246,15 +270,19 @@ class ContentPage extends HookWidget {
                                 .toList(),
                           ),
                         ),
-                  // 描述
-                  contentInfo == null || contentInfo.desc.isEmpty
-                      ? const SizedBox()
-                      : html.Html(
-                          data: contentInfo.desc,
-                        ),
                 ],
               ),
             ),
+            // 描述
+            contentInfo == null || contentInfo.desc.isEmpty
+                ? const SizedBox()
+                : Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: html.Html(
+                      data: contentInfo.desc,
+                    ),
+                  ),
             // 主题
             themes.isEmpty
                 ? const SizedBox()
