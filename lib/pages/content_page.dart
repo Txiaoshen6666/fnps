@@ -96,18 +96,22 @@ class ContentPage extends HookWidget {
                         height: 128,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
-                          child: CachedNetworkImage(
-                            imageUrl: getContentIcon(content.contentID),
-                            fit: BoxFit.contain,
-                            placeholder: (context, url) => const SizedBox(
-                              width: 100,
-                              height: 100,
-                              child: Center(
-                                child: CircularProgressIndicator(),
+                          child: InkWell(
+                            onTap: () =>
+                                launchURL(getContentIcon(content.contentID)),
+                            child: CachedNetworkImage(
+                              imageUrl: getContentIcon(content.contentID),
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => const SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.gamepad),
                             ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.gamepad),
                           ),
                         ),
                       ),
@@ -248,21 +252,25 @@ class ContentPage extends HookWidget {
                                     padding: const EdgeInsets.all(4),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
-                                      child: CachedNetworkImage(
-                                        imageUrl: image,
-                                        fit: BoxFit.contain,
-                                        width: 480 / 3 * 2,
-                                        height: 272 / 3 * 2,
-                                        placeholder: (context, url) =>
-                                            const SizedBox(
-                                          width: 100,
-                                          height: 100,
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
+                                      child: InkWell(
+                                        onTap: () => launchURL(image),
+                                        child: CachedNetworkImage(
+                                          imageUrl: image,
+                                          fit: BoxFit.contain,
+                                          width: 480 / 3 * 2,
+                                          height: 272 / 3 * 2,
+                                          placeholder: (context, url) =>
+                                              const SizedBox(
+                                            width: 100,
+                                            height: 100,
+                                            child: Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
                                           ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
                                         ),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
                                       ),
                                     ),
                                   ),
